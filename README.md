@@ -16,162 +16,228 @@ style: |
   }
 ---
 
-# **Contact Us Form System (ADO.NET)**
+# <!-- fit --> **Contact Us Form System – Repository + Service Pattern (ADO.NET)**
 
 ---
 
-## **Task 1: Create the Project and Configure ADO.NET**
+## **Task 1: Create the Project and Structure**
 
 **Problem Statement:**  
-Set up a basic ASP.NET Core Web API project and configure it to use ADO.NET for database interactions.
+Set up an ASP.NET Core Web API using ADO.NET with clean architecture.
 
 **Solution Outline:**
 
-1. Create the project using `dotnet new webapi`.
-2. Configure the SQL Server connection string in `appsettings.json`.
-3. Register configuration in `Program.cs`:
-   ```csharp
-   builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-   ```
+1. Run `dotnet new webapi -n ContactUsSystem`
+2. Add folders:
+   - `Models`
+   - `DTOs/ContactMessage`
+   - `Controllers`
+   - `Repositories`
+   - `Services`
+   - `Interfaces/Repositories`
+   - `Interfaces/Services`
 
 ---
 
 ## **Task 2: Define the `ContactMessage` Model**
 
-**Problem Statement:**
-Create a class that represents a contact message with fields such as `Name`, `Email`, `Subject`, and `Message`.
+**Problem Statement:**  
+Create the core model for contact message data.
 
 **Solution Outline:**
 
-1. Create a `Models` folder and add `ContactMessage.cs` with:
-   - `Id` (int)
-   - `Name` (string)
-   - `Email` (string)
-   - `Subject` (string)
-   - `Message` (string)
-   - `CreatedAt` (DateTime)
+Create `Models/ContactMessage.cs`:
+
+- `Id` (int)
+- `Name` (string)
+- `Email` (string)
+- `Subject` (string)
+- `Message` (string)
+- `CreatedAt` (DateTime)
 
 ---
 
-## **Task 3: Create the SQL Table**
+## **Task 3: Create DTOs for Contact Message**
 
-**Problem Statement:**
-Create a `ContactMessages` table in SQL Server to store contact form submissions.
+**Problem Statement:**  
+Use DTOs to transfer data between layers.
 
 **Solution Outline:**
 
-1. Create the table using SQL:
-   ```sql
-   CREATE TABLE ContactMessages (
-     Id INT PRIMARY KEY IDENTITY,
-     Name NVARCHAR(100) NOT NULL,
-     Email NVARCHAR(100) NOT NULL,
-     Subject NVARCHAR(200),
-     Message NVARCHAR(MAX) NOT NULL,
-     CreatedAt DATETIME NOT NULL DEFAULT GETDATE()
-   );
-   ```
+In `DTOs/ContactMessage`, define:
+
+- `CreateContactMessageDTO`
+- `ContactMessageDTO`
+
+Used for API input/output formatting.
 
 ---
 
-## **Task 4: Implement the `ContactController` with ADO.NET**
+## **Task 4: Create SQL Table**
 
-**Problem Statement:**
-Use ADO.NET to perform CRUD operations for the `ContactMessage` entity.
+**Problem Statement:**  
+Create the table to store contact messages in SQL Server.
 
 **Solution Outline:**
 
-1. Create a `Controllers` folder and add `ContactController.cs`.
-2. Inject `IConfiguration` to access the connection string.
-3. Implement `POST`, `GET`, `GET by ID`, and `DELETE` endpoints using ADO.NET:
-   - Use `SqlConnection`, `SqlCommand`, and `SqlDataReader`.
+```sql
+CREATE TABLE ContactMessages (
+  Id INT PRIMARY KEY IDENTITY,
+  Name NVARCHAR(100) NOT NULL,
+  Email NVARCHAR(100) NOT NULL,
+  Subject NVARCHAR(200),
+  Message NVARCHAR(MAX) NOT NULL,
+  CreatedAt DATETIME NOT NULL DEFAULT GETDATE()
+);
+```
 
 ---
 
-## **Task 5: Add DTOs for Contact Message**
+## **Task 5: Create Repository Interface and Implementation**
 
-**Problem Statement:**
-Use DTOs to separate database models from API request/response formats.
+**Problem Statement:**  
+Handle database access using ADO.NET.
 
 **Solution Outline:**
 
-1. Create a `DTOs/ContactMessage` folder.
-2. Add:
-   - `CreateContactMessageDTO`
-   - `ContactMessageDTO`
-3. Map manually inside controller methods.
+1. `Interfaces/Repositories/IContactRepository.cs`
+2. `Repositories/ContactRepository.cs`
+3. Use:
+   - `SqlConnection`
+   - `SqlCommand`
+   - `SqlDataReader`
+4. Methods:
+   - `GetAll()`
+   - `GetById(int id)`
+   - `Create(ContactMessage msg)`
+   - `Delete(int id)`
 
 ---
 
-## **Task 6: Add Input Validation**
+**Inject `IConfiguration` into the repository** to access the connection string:
 
-**Problem Statement:**
-Ensure that input data for the contact form is validated before saving.
+```csharp
+private readonly IConfiguration _configuration;
 
-**Solution Outline:**
-
-1. Use validation attributes:
-   - `[Required]`, `[EmailAddress]`, `[StringLength]`.
-2. Validate with `ModelState.IsValid`.
+public ContactRepository(IConfiguration configuration)
+{
+    _configuration = configuration;
+}
+```
 
 ---
 
-## **Task 7: Secure Against SQL Injection**
+## **Task 6: Create Service Interface and Implementation**
 
 **Problem Statement:**
-Ensure ADO.NET queries are secure against SQL injection attacks.
+Business logic and mapping layer between controller and repository.
 
 **Solution Outline:**
 
-1. Always use parameterized queries:
+1. `Interfaces/Services/IContactService.cs`
+2. `Services/ContactService.cs`
+3. Logic:
+   - Validate
+   - Map DTOs to models
+   - Call repository methods
+
+---
+
+## **Task 7: Implement the `ContactController`**
+
+**Problem Statement:**
+Handle API requests using controller → service → repo.
+
+**Solution Outline:**
+
+1. Create `ContactController.cs`
+2. Inject `IContactService`
+3. Add endpoints:
+   - `POST /api/contact`
+   - `GET /api/contact`
+   - `GET /api/contact/{id}`
+   - `DELETE /api/contact/{id}`
+
+---
+
+## **Task 8: Add Input Validation**
+
+**Problem Statement:**
+Validate incoming request data.
+
+**Solution Outline:**
+
+1. Use:
+   - `[Required]`, `[EmailAddress]`, `[StringLength]` in DTOs
+2. In controller:
    ```csharp
-   cmd.Parameters.AddWithValue("@Email", dto.Email);
+   if (!ModelState.IsValid) return BadRequest(ModelState);
    ```
 
+````
+
 ---
 
-## **Task 8: Test the Contact API**
+## **Task 9: Secure Against SQL Injection**
 
 **Problem Statement:**
-Test each API endpoint using Swagger or Postman.
+Prevent injection vulnerabilities in queries.
 
 **Solution Outline:**
 
-1. Verify:
-   - Creating a message.
-   - Retrieving all messages.
-   - Retrieving by ID.
-   - Deleting a message.
-2. Test both valid and invalid inputs.
+Use parameterized queries:
+
+```csharp
+cmd.Parameters.AddWithValue("@Email", dto.Email);
+```
+
+Never build raw SQL strings directly with user input.
 
 ---
 
-## **Task 9: Add Logging and Error Handling**
+## **Task 10: Add Logging and Error Handling**
 
 **Problem Statement:**
-Log errors and handle exceptions gracefully in the API.
+Log application errors and show friendly error responses.
 
 **Solution Outline:**
 
-1. Use try-catch blocks in each action method.
-2. Log errors using `ILogger<ContactController>`.
+1. Inject `ILogger<ContactController>`
+2. Wrap logic in `try-catch` blocks
+3. Return:
+   - `500 InternalServerError` on exceptions
+   - `404 NotFound` when needed
 
 ---
 
-## **Task 10: Prepare for Deployment**
+## **Task 11: Test the Contact API**
 
 **Problem Statement:**
-Prepare the application for production deployment.
+Manually test the endpoints.
 
 **Solution Outline:**
 
-1. Enable CORS and HTTPS redirection.
-2. Set up proper environment settings.
-3. Publish using:
-   ```bash
-   dotnet publish -c Release
-   ```
+1. Open Swagger `/swagger`
+2. Test all endpoints:
+   - Add message
+   - View messages
+   - View by ID
+   - Delete message
 
 ---
 
-# ✅ Done! Contact Us System with ADO.NET
+## **Task 12: Prepare for Deployment**
+
+**Problem Statement:**
+Get ready to publish and deploy to production.
+
+**Solution Outline:**
+
+1. Enable CORS & HTTPS redirection
+2. Use `dotnet publish -c Release`
+3. Host on IIS, Azure, or other platform
+
+---
+
+# ✅ Contact Us System – Repository + Service + ADO.NET
+````
