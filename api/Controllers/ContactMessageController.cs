@@ -12,7 +12,7 @@ using Microsoft.Data.SqlClient;
 namespace api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/messages")]
     public class ContactMessageController : ControllerBase
     {
         private readonly IConfiguration _config;
