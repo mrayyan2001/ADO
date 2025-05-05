@@ -1,6 +1,15 @@
-USE [ContactUsDb] 
+USE [ContactUsDb];
 GO
-DROP TABLE IF EXISTS [dbo].[ContactMessages];
+CREATE TABLE [dbo].[Users]
+(
+    [Id] INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    [FirstName] NVARCHAR(100) NOT NULL,
+    [LastName] NVARCHAR(100) NOT NULL,
+    [Email] NVARCHAR(100) NOT NULL,
+    [PasswordHash] NVARCHAR(128) NOT NULL,
+    [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
+    [ContactFormToken] UNIQUEIDENTIFIER UNIQUE NOT NULL DEFAULT NEWID()
+)
 GO
 CREATE TABLE [dbo].[ContactMessages]
 (
@@ -8,5 +17,8 @@ CREATE TABLE [dbo].[ContactMessages]
     [Name] NVARCHAR(100) NOT NULL,
     [Email] NVARCHAR(100) NOT NULL,
     [Message] NVARCHAR(MAX) NOT NULL,
-    [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE()
+    [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE(),
+    [UserId] INT NOT NULL,
+    FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([Id]),
 );
+GO
