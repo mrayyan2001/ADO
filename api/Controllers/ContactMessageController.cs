@@ -24,25 +24,32 @@ namespace api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var selectCommand = @$"
+            try
+            {
+                var selectCommand = @$"
                         SELECT Id, Name, CreatedAt
                         FROM ContactMessages
                         ORDER BY CreatedAt ASC
                         OFFSET {(pageNumber - 1) * pageSize} ROWS fetch next {pageSize} rows only;
                         ";
 
-            using (var adapter = new SqlDataAdapter(selectCommand, _conn))
-            {
-                await _conn.OpenAsync();
-
-                var data = new DataTable();
-                adapter.Fill(data);
-                return Ok(data.AsEnumerable().Select(d => new ContactMessageDto()
+                using (var adapter = new SqlDataAdapter(selectCommand, _conn))
                 {
-                    Id = (int)d["Id"],
-                    Name = d["Name"]?.ToString() ?? string.Empty,
-                    CreatedAt = d["CreatedAt"]?.ToString() ?? string.Empty
-                }));
+                    await _conn.OpenAsync();
+
+                    var data = new DataTable();
+                    adapter.Fill(data);
+                    return Ok(data.AsEnumerable().Select(d => new ContactMessageDto()
+                    {
+                        Id = (int)d["Id"],
+                        Name = d["Name"]?.ToString() ?? string.Empty,
+                        CreatedAt = d["CreatedAt"]?.ToString() ?? string.Empty
+                    }));
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
@@ -85,7 +92,61 @@ namespace api.Controllers
             }
         }
 
-       
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateContactMessageDto dto)
+        {
+            try
+            {
+                var cmdText = @"INSERT INTO [dbo].[ContactMessages]
+                                ([Name], [Email], [Message], [CreatedAt])
+                            VALUES
+                                (@Name, @Email, @Message, @CreatedAt)
+                            SELECT CAST(SCOPE_IDENTITY() AS INT);
+                            ";
+                using (var cmd = new SqlCommand(cmdText, _conn))
+                {
+                    cmd.Parameters.AddWithValue("@Name", dto.Name);
+                    cmd.Parameters.AddWithValue("@Email", dto.Email);
+                    cmd.Parameters.AddWithValue("@Message", dto.Message);
+                    cmd.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
+                    await _conn.OpenAsync();
+                    var result = await cmd.ExecuteScalarAsync();
+                    if (result is null)
+                        return BadRequest();
+                    return Ok(new { StatusCode = 200, Message = "Messaged added", Id = (int)result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteById([FromRoute] int id)
+        {
+            try
+            {
+                var cmdText = @$"
+                                DELETE FROM  [dbo].[ContactMessages]
+                                WHERE Id = {id}
+                                ";
+                using (var cmd = new SqlCommand(cmdText, _conn))
+                {
+                    await _conn.OpenAsync();
+                    int result = cmd.ExecuteNonQuery();
+                    if (result > 0)
+                    {
+                        return Ok("Message removed");
+                    }
+                }
+                return NotFound("Messaged not found");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }
