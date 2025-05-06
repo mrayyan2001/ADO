@@ -30,9 +30,9 @@ namespace api.Controllers
             {
                 var cmdText = @$"
             INSERT INTO [users]
-                (FirstName, LastName, Email, PasswordHash, ContactFormToken, CreatedAt)
+                (FirstName, LastName, Email, Username, PasswordHash, ContactFormToken, CreatedAt)
             VALUES
-                (@FirstName, @LastName, @Email, @PasswordHash, @ContactFormToken, @CreatedAt);
+                (@FirstName, @LastName, @Email, @Username, @PasswordHash, @ContactFormToken, @CreatedAt);
             SELECT CAST(SCOPE_IDENTITY() AS INT) AS UserId;
             ";
                 using (var conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
@@ -43,6 +43,7 @@ namespace api.Controllers
                         cmd.Parameters.AddWithValue("@FirstName", dto.FirstName);
                         cmd.Parameters.AddWithValue("@LastName", dto.LastName);
                         cmd.Parameters.AddWithValue("@Email", dto.Email);
+                        cmd.Parameters.AddWithValue("@Username", dto.Username);
                         cmd.Parameters.AddWithValue("@PasswordHash", HashHelper.ComputeSha512(dto.Password));
                         cmd.Parameters.AddWithValue("@ContactFormToken", contactFormToken);
                         cmd.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
@@ -81,13 +82,13 @@ namespace api.Controllers
             try
             {
                 var cmdText = @"
-                SELECT Id, FirstName, LastName, ContactFormToken
+                SELECT Id, FirstName, LastName, Email, ContactFormToken
                 FROM Users
-                WHERE Email = @Email AND PasswordHash = @PasswordHash;
+                WHERE Username = @Username AND PasswordHash = @PasswordHash;
                 ";
                 await using var conn = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
                 await using var command = new SqlCommand(cmdText, conn);
-                command.Parameters.AddWithValue("@Email", dto.Email);
+                command.Parameters.AddWithValue("@Username", dto.Username);
                 command.Parameters.AddWithValue("@PasswordHash", HashHelper.ComputeSha512(dto.Password));
                 await conn.OpenAsync();
                 using (var reader = await command.ExecuteReaderAsync())
@@ -101,13 +102,14 @@ namespace api.Controllers
                             {
                                 FirstName = reader["FirstName"]?.ToString() ?? string.Empty,
                                 LastName = reader["LastName"]?.ToString() ?? string.Empty,
-                                Email = dto.Email,
+                                Email = reader["Email"]?.ToString() ?? string.Empty,
+                                Username = dto.Username,
                                 ContactFormToken = reader["ContactFormToken"]?.ToString() ?? string.Empty
                             },
-                            Token = _tokenService.CreateToken(Convert.ToInt32(reader["Id"]), dto.Email, "User")
+                            Token = _tokenService.CreateToken(Convert.ToInt32(reader["Id"]), reader["Email"]?.ToString() ?? string.Empty, "User")
                         });
                     }
-                    return Unauthorized("Email or Password is invalid.");
+                    return Unauthorized("Username or Password is invalid.");
                 }
 
             }
