@@ -107,37 +107,6 @@ namespace api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Authorize]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteById([FromRoute] int id)
-        {
-            try
-            {
-                var cmdText = @$"
-                                DELETE FROM  [dbo].[ContactMessages]
-                                WHERE Id = {id}
-                                ";
-                using (var conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
-
-                {
-                    using (var cmd = new SqlCommand(cmdText, conn))
-                    {
-                        await conn.OpenAsync();
-                        int result = await cmd.ExecuteNonQueryAsync();
-                        if (result > 0)
-                        {
-                            return Ok("Message removed");
-                        }
-                    }
-                }
-                return NotFound("Messaged not found");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
         [HttpPost("{contactFormToken}")]
         public async Task<IActionResult> Create([FromRoute] string contactFormToken, [FromBody] CreateContactMessageDto dto)
         {
