@@ -1,0 +1,223 @@
+{
+	"info": {
+		"_postman_id": "33c1b863-99c3-455d-9e0b-db0ea672aadc",
+		"name": "Contact Us Form",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43341754"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"Heba\",\r\n  \"lastName\": \"Abu Shareefeh\",\r\n  \"email\": \"heba@gmail.com\",\r\n  \"username\": \"heba\",\r\n  \"password\": \"heba\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5291/api/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5291",
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'POST' \\\r\n  'http://localhost:5291/api/users' \\\r\n  -H 'accept: */*' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"firstName\": \"Mohammad\",\r\n  \"lastName\": \"Mrayyan\",\r\n  \"email\": \"mrayyan@gmail.com\",\r\n  \"password\": \"Mrayyan@2001\"\r\n}'"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"mrayyan\",\r\n  \"password\": \"mrayyan\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5291/api/users/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5291",
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'POST' \\\r\n  'http://localhost:5291/api/users/login' \\\r\n  -H 'accept: */*' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"email\": \"user@example.com\",\r\n  \"password\": \"string\"\r\n}'"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Message",
+			"item": [
+				{
+					"name": "Get All Messages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJtcmF5eWFuQGdtYWlsLmNvbSIsImp0aSI6IjU1ZDJmNjg0LTAzMDgtNDAwYi1hYmRiLTk2YTYyYWVhN2Y5MyIsInJvbGUiOiJVc2VyIiwiZXhwIjoxNzQ2NTU5ODY5LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUyOTEiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjUyOTEifQ.oOMaz22Mm1fyxT08jv_H-EltYWgjqxWTNHw9-psk2XvxhW6pJECAcqbbO_7Mzps64k0VxZ1LgihjDZm3GZX0HA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5291/api/messages?pageNumber=1&pageSize=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5291",
+							"path": [
+								"api",
+								"messages"
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X 'GET' \\\r\n  'http://localhost:5291/api/messages?pageNumber=1&pageSize=10' \\\r\n  -H 'accept: */*'"
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJtcmF5eWFuQGdtYWlsLmNvbSIsImp0aSI6IjU1ZDJmNjg0LTAzMDgtNDAwYi1hYmRiLTk2YTYyYWVhN2Y5MyIsInJvbGUiOiJVc2VyIiwiZXhwIjoxNzQ2NTU5ODY5LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUyOTEiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjUyOTEifQ.oOMaz22Mm1fyxT08jv_H-EltYWgjqxWTNHw9-psk2XvxhW6pJECAcqbbO_7Mzps64k0VxZ1LgihjDZm3GZX0HA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5291/api/messages/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5291",
+							"path": [
+								"api",
+								"messages",
+								"1"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'GET' \\\r\n  'http://localhost:5291/api/messages/1' \\\r\n  -H 'accept: */*'"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"string\",\r\n  \"email\": \"user@example.com\",\r\n  \"message\": \"string\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5291/api/messages/7dec38d7-07d1-4df7-b979-be6711e17526",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5291",
+							"path": [
+								"api",
+								"messages",
+								"7dec38d7-07d1-4df7-b979-be6711e17526"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'POST' \\\r\n  'http://localhost:5291/api/messages/5cddc3cf-4fd9-47db-b4bc-52b46b084ebd' \\\r\n  -H 'accept: */*' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"name\": \"string\",\r\n  \"email\": \"user@example.com\",\r\n  \"message\": \"string\"\r\n}'"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
