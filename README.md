@@ -100,12 +100,16 @@ Handle database access using ADO.NET.
 
 **Solution Outline:**
 
-1. `Interfaces/Repositories/IContactRepository.cs`
-2. `Repositories/ContactRepository.cs`
+1. `Interfaces/IContactRepository.cs`
+2. `Repositories/ContactRepository.cs` and `Repositories/DataAdapterContactRepository.cs`
 3. Use:
    - `SqlConnection`
    - `SqlCommand`
    - `SqlDataReader`
+   - and in `DataAdapterContactRepository`: (We have two implementations)
+   - `SqlDataAdapter`
+   - `DataTable`
+   - `SqlDataBuilder`
 4. Methods:
    - `GetAll()`
    - `GetById(int id)`
@@ -174,8 +178,6 @@ Validate incoming request data.
    if (!ModelState.IsValid) return BadRequest(ModelState);
    ```
 
-````
-
 ---
 
 ## **Task 9: Secure Against SQL Injection**
@@ -240,4 +242,3 @@ Get ready to publish and deploy to production.
 ---
 
 # ✅ Contact Us System – Repository + Service + ADO.NET
-````
